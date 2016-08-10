@@ -1,5 +1,5 @@
 // Comando para compilar (é necessário utilizar o c++11)
-//g++ -std=c++11 -g `pkg-config --cflags opencv` gtruth.cpp -o GroundTruth `pkg-config --libs opencv`
+//g++ -std=c++11 -g `pkg-config --cflags opencv` gtruth.cpp -o GroundTruth.out `pkg-config --libs opencv`
 #include <iostream>
 #include <fstream>
 #include <sstream>
@@ -11,7 +11,7 @@ using namespace std;
 
 #define SCALE 1
 
-FILE *arqi;
+FILE *arqi, *arq2;
 Mat image, vis;
 typedef struct pontos{
 	int X;
@@ -51,36 +51,37 @@ void marker(string nome){
 
 	ponto.clear();
 	nome.erase(nome.end() - 4, nome.end());
-	arqi= fopen((nome + ".txt").c_str(),"w");
+	arqi= fopen(("coordenadas/"+ nome + ".txt").c_str(),"w");
 	// Create visualizer
 	vis.create(image.rows*SCALE, image.cols*SCALE, CV_8UC3);
 	cout << "Ordem das marcações:" << "\n" <<
 		"Olho esquerdo e depois olho direito" << "\n" <<
-		"Em seguuida o nariz" << "\n" << 
+		"Em seguida o nariz" << "\n" << 
 		"--------------------------------" << "\n" <<
 		"Pressione 'S' para Salvar" << endl;
 	// Application loop
-	draw();
-	namedWindow("gtruth", 1);
-	setMouseCallback("gtruth", mousefunc, NULL);
-	char c;
-	while((c = waitKey(10)) != 27) {
-		switch(c) {
-			case 's':
-				for(int i=0; i < ponto.size(); i++){
-					fprintf(arqi, "%d %d\n", ponto[i].Y/SCALE,ponto[i].X/SCALE);
-				}
-				cout << "Save file: " << nome << endl;
-				break;
-			case '\b':
-				ponto.pop_back();
-				draw();
-		}
-		imshow("gtruth", vis);
-	}
-	fclose(arqi);
+//	draw();
+//	namedWindow("gtruth", 1);
+//	setMouseCallback("gtruth", mousefunc, NULL);
+//	char c;
+//	while((c = waitKey(10)) != 27) {
+//		switch(c) {
+//			case 's':
+//				for(int i=0; i < ponto.size(); i++){
+//					fprintf(arqi, "%d %d\n", ponto[i].Y/SCALE,ponto[i].X/SCALE);
+//				}
+//				cout << "Save file: " << nome << endl;
+//				break;
+//			case '\b':
+//				ponto.pop_back();
+//				draw();
+//		}
+//		imshow("gtruth", vis);
+//	}
+	
+	cout << "FIM DA FUNÇÃO" << endl;
 }
-
+/*
 void viewMinutiae(string caminho){
 	int x,y, j=0;
 	string line, letra, xiz, ipicilon;
@@ -105,16 +106,37 @@ void viewMinutiae(string caminho){
 	while((c = waitKey(10)) != 27)
 		imshow("gtruth", vis);
 }
-int main(int argc, char **argv) {
+*/
+int main() {
 	//Altere o valor de "decision" para visualizar ou para marcar a imagem
 	bool decision = true; //'true' para plotar || "false" para exibir imagem plotada
-	// Load image
-	image = imread(argv[1], 1);
-	if(decision){
-		// Marca as minúcias
-		marker(argv[1]);
-	}else{
-		//Visualiza as minúcias marcadas
-		viewMinutiae(argv[2]);
+
+	//if(argc < 2){
+	//	cout << "Usage: ./segamentation <path_to_image>" << endl;
+	//	return 0;
+	//}
+	int a=1;
+	//input images
+	string line, caminho = "imagens.txt";
+	ifstream file(caminho, ifstream::in);
+	while(getline(file,line)){
+		line.erase(line.begin(), line.begin()+10);
+		cout << a++ << ": "<<  line << endl;
+		
+		// Load image
+		image = imread(line, 1);
+		if(decision){
+			// Marca as minúcias
+			marker(line);
+			
+			//cout << a++ << endl;
+		}else{
+			//Visualiza as minúcias marcadas
+			//viewMinutiae(line);
+		}
 	}
+	//fclose(arqi);
 }
+
+
+//nome.erase(nome.end() - 7, nome.end());
