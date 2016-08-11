@@ -4,7 +4,7 @@ Após as marcações, será feito a média dos pontos de cada olho e posteriorme
 
 Diretório:
 ```
-<groundTruth/nomeDeQuemMarcou/n_m.bmp>
+<groundTruth/nomeDeQuemMarcou_groundTruth/n_m.bmp>
 ```
 **n**: 1 <= n >= 25
 
@@ -15,3 +15,20 @@ Arquivo referente à imagem marcada:
 ```
 <nome da imagem.jpeg> <olhoEsq> <olhoDir> <nariz>
 ```
+
+
+# Como compilar e executar o código...
+
+
+Compile com:
+```
+g++ -std=c++11 -g `pkg-config --cflags opencv` gtruth.cpp -o GroundTruth.out `pkg-config --libs opencv`
+```
+
+Execute com:
+```
+./GroundTruth.out
+```
+
+OBS: Não é necessário passar parâmetro na execução do algoritmo
+
