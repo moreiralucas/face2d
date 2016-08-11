@@ -13,6 +13,7 @@ using namespace std;
 
 FILE *arqi, *arq2;
 Mat image, vis;
+
 typedef struct pontos{
 	int X;
 	int Y;
@@ -27,17 +28,7 @@ void draw() {
 			vis.at<Vec3b>(i,j)[0] = image.at<Vec3b>(i/SCALE,j/SCALE)[0];
 		}
 	for(int i=0; i < ponto.size(); i++)
-		//switch(ponto[i].tipo){
-			//case 'e':
-				circle(vis, Point(ponto[i].Y,ponto[i].X), 3, Scalar(255,0,0), -1);
-			//	break;
-			//case 'd':
-			//	circle(vis, Point(ponto[i].Y,ponto[i].X), 3, Scalar(0,255,0), -1);
-			//	break;
-			//case 'n':
-			//	circle(vis, Point(ponto[i].Y,ponto[i].X), 3, Scalar(0,0,255), -1);
-			//	break;
-		//}
+		circle(vis, Point(ponto[i].Y,ponto[i].X), 3, Scalar(255,0,0), -1);
 	imshow("gtruth", vis);
 }
 void mousefunc(int event, int x, int y, int flags, void* userdata) {
@@ -50,93 +41,60 @@ void marker(string nome){
 	fstream fp;
 
 	ponto.clear();
-	nome.erase(nome.end() - 4, nome.end());
-	arqi= fopen(("coordenadas/"+ nome + ".txt").c_str(),"w");
+	arqi= fopen(("coordenadas_groundTruth/"+ nome + ".txt").c_str(),"w");
 	// Create visualizer
 	vis.create(image.rows*SCALE, image.cols*SCALE, CV_8UC3);
-	cout << "Ordem das marcações:" << "\n" <<
-		"Olho esquerdo e depois olho direito" << "\n" <<
-		"Em seguida o nariz" << "\n" << 
-		"--------------------------------" << "\n" <<
-		"Pressione 'S' para Salvar" << endl;
+	cout << "--------------------------------\n" <<
+		"Imagem: " + nome + ".bmp\n" <<
+		"--------------------------------\n" <<
+		"Pressione 'S' para Salvar\nPressione 'Esc' pra ir para a próxima" << endl;
 	// Application loop
-//	draw();
-//	namedWindow("gtruth", 1);
-//	setMouseCallback("gtruth", mousefunc, NULL);
-//	char c;
-//	while((c = waitKey(10)) != 27) {
-//		switch(c) {
-//			case 's':
-//				for(int i=0; i < ponto.size(); i++){
-//					fprintf(arqi, "%d %d\n", ponto[i].Y/SCALE,ponto[i].X/SCALE);
-//				}
-//				cout << "Save file: " << nome << endl;
-//				break;
-//			case '\b':
-//				ponto.pop_back();
-//				draw();
-//		}
-//		imshow("gtruth", vis);
-//	}
-	
-	cout << "FIM DA FUNÇÃO" << endl;
-}
-/*
-void viewMinutiae(string caminho){
-	int x,y, j=0;
-	string line, letra, xiz, ipicilon;
-	ifstream file(caminho, ifstream::in);
-	ponto.clear();
-	vis.create(image.rows*SCALE, image.cols*SCALE, CV_8UC3);
-	
-	while(getline(file,line)){
-		stringstream lines(line);
-		getline(lines,letra,' ');
-		getline(lines,ipicilon, ' ');
-		getline(lines,xiz);
-		x=atoi(xiz.c_str());
-		y=atoi(ipicilon.c_str());
-		cout << letra << " " << y << " " << x << endl;
-		ponto.push_back({y*SCALE,x*SCALE,letra[0]});
-	}
 	draw();
 	namedWindow("gtruth", 1);
+	setMouseCallback("gtruth", mousefunc, NULL);
 	char c;
-	
-	while((c = waitKey(10)) != 27)
-		imshow("gtruth", vis);
-}
-*/
-int main() {
-	//Altere o valor de "decision" para visualizar ou para marcar a imagem
-	bool decision = true; //'true' para plotar || "false" para exibir imagem plotada
-
-	//if(argc < 2){
-	//	cout << "Usage: ./segamentation <path_to_image>" << endl;
-	//	return 0;
-	//}
-	int a=1;
-	//input images
-	string line, caminho = "imagens.txt";
-	ifstream file(caminho, ifstream::in);
-	while(getline(file,line)){
-		line.erase(line.begin(), line.begin()+10);
-		cout << a++ << ": "<<  line << endl;
-		
-		// Load image
-		image = imread(line, 1);
-		if(decision){
-			// Marca as minúcias
-			marker(line);
-			
-			//cout << a++ << endl;
-		}else{
-			//Visualiza as minúcias marcadas
-			//viewMinutiae(line);
+	while((c = waitKey(10)) != 27) {
+		switch(c) {
+			case 's':
+				for(int i=0; i < ponto.size(); i++){
+					fprintf(arqi, "%d %d\n", ponto[i].Y/SCALE,ponto[i].X/SCALE);
+				}
+				cout << "Save file: " << nome << endl;
+				break;
+			case '\b':
+				if (!ponto.empty())
+					ponto.pop_back();
+				draw();
 		}
+		imshow("gtruth", vis);
+	}
+	fclose(arqi);
+}
+int main() {
+	string line, caminho = "imagens.txt";
+	std::ifstream file(caminho.c_str(), ifstream::in);
+	system("clear");
+	//input images	
+	while(getline(file,line)){
+		stringstream lines(line);
+		//cout << "caminho: " + caminho << endl;
+		getline(lines,caminho,';');
+		
+		if (!caminho.empty()){
+			// Load image
+			image = imread(caminho, 1);
+			
+			int p = caminho.rfind('/')+1;
+			int x = caminho.rfind('.');
+			string nomes = caminho.substr(p,x-p);
+
+			// Marca as minúcias
+			marker(nomes);
+		}
+		cout << "PRÓXIMA!\n\n\n" << endl;
+		system("clear");
 	}
 	//fclose(arqi);
 }
-
 
 //nome.erase(nome.end() - 7, nome.end());
