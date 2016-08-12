@@ -50,7 +50,7 @@ void marker(string nome){
 		"Pressione 'S' para Salvar\nPressione 'Esc' pra ir para a próxima" << endl;
 	// Application loop
 	draw();
-	namedWindow("gtruth", 1);
+	namedWindow("gtruth", 1); //Trocar o valor 1 por WINDOW_AUTOSIZE
 	setMouseCallback("gtruth", mousefunc, NULL);
 	char c;
 	while((c = waitKey(10)) != 27) {
