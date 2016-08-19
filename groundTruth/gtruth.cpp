@@ -1,5 +1,6 @@
 // Comando para compilar (é necessário utilizar o c++11)
-//g++ -std=c++11 -g `pkg-config --cflags opencv` gtruth.cpp -o GroundTruth.out `pkg-config --libs opencv`
+//g++ -std=c++11 -g gtruth.cpp -o GroundTruth.out `pkg-config --libs opencv --cflags opencv`
+
 #include <iostream>
 #include <fstream>
 #include <sstream>
