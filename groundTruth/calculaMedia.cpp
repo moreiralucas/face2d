@@ -8,12 +8,7 @@ typedef struct ponto{
 }Point;
 FILE *arqi;
 vector<Point> A, B, C, vetor;
-void imprimeVetor(vector<Point> pontos){
-	//Point A;
-	//while(!pontos.empty()){
-	//	cout << A.x << " " << A.y << endl;
-	//}
-}
+
 Point media2Pontos(Point um, Point dois){
 	Point result;
 	result.x = (um.x+dois.x)/2;
@@ -25,6 +20,16 @@ Point media3pontos(Point um, Point dois, Point tres){
 	result.x = (um.x+dois.x+tres.x)/3;
 	result.y = (um.y+dois.y+tres.y)/3;
 	return result;
+}
+void calcMediaGeral(){
+	Point a, b, c;
+	for (int i = 0; i < 3; ++i)	{
+		a = A.back(); A.pop_back();
+		b = B.back(); B.pop_back();
+		c = C.back(); C.pop_back();
+
+		vetor.push_back(media3pontos(a,b,c));
+	}
 }
 void calcMedIndividual(string caminho){
     int x, y;
@@ -55,32 +60,24 @@ void calcMedIndividual(string caminho){
     	if((i%2) == 0){
     		tmp2 = pontos.back();
     		C.push_back(media2Pontos(tmp,tmp2));
-    		cout << "É par: ";
+    		//cout << "É par: ";
     	}
     	tmp = pontos.back();
     	pontos.pop_back();
-    	cout <<"i:"<< i <<" "<< tmp.x <<" "<< tmp.y << endl;
     }
     C.push_back(tmp);
-    //imprimeVetor(pontos);
 }
-void calcMediaGeral(){
-	Point a, b, c;
-	for (int i = 0; i < 3; ++i)	{
-		a = A.back(); A.pop_back();
-		b = B.back(); B.pop_back();
-		c = C.back(); C.pop_back();
 
-		vetor.push_back(media3pontos(a,b,c));
-	}
-}
-void writeFile(string nome){
+void writeFile(string str){
+	string nome = str.substr(str.find('/')+1, str.rfind('.')-str.find('/')-1);
 	arqi= fopen(("coordenadas_groundTruth/"+ nome + ".txt").c_str(),"w");
 	Point tmp;
+
 	for (int i = 0; i < 3; ++i){
 		tmp = vetor.back();
 		vetor.pop_back();
-		fprintf(arqi, "%d %d", tmp.x, tmp.y);
+		cout << tmp.x << " " << tmp.y << endl;
+		fprintf(arqi, "%d %d\n", tmp.x, tmp.y);
 	}
 	cout << "Save file: " << nome << endl;
 	fclose(arqi);
@@ -88,18 +85,17 @@ void writeFile(string nome){
 int main(int argc, char const *argv[]){
 
 	if(argc < 2){
-		cout << "error!\nImage not found!" << endl;
+		cout << "error!\nFile not found!" << endl;
 		return 0;
 	}
-	calcMedIndividual(argv[1]);
+
+	calcMedIndividual(argv[1]); //cout << "Primeiro!" << endl;
 	swap(C,A);
-	calcMedIndividual(argv[2]);
+	calcMedIndividual(argv[2]); //cout << "Segundo!" << endl;
 	swap(C,B);
-	calcMedIndividual(argv[3]);
+	calcMedIndividual(argv[3]); //cout << "Terceiro!" << endl;
 	
 	calcMediaGeral();
 	
-	string nome = argv[1];
-	writeFile(nome);
-	
+	writeFile(argv[1]);
 }
