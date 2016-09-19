@@ -6,33 +6,22 @@ import sys
 import cv2
 import os
 #import xmltodict
+import itertools
+
+def angle(p1, p2):
+    angle = np.arctan2(p2[1]-p1[1], p2[0]-p1[0])
+    print p1, p2, angle
+    return angle
 
 def drawGroundTruthPoint(Img,(x,y),radius):
     cv2.circle(Img,(x,y),radius,(0,0,255))
     cv2.circle(Img,(x,y),1,(255,0,0))
     return Img
 
-def drawAnchorPoint(Img,(x,y),radius):
-    cv2.line(Img,(x,y-radius/2),(x,y+radius/2),(0,255,0))
-    cv2.line(Img,(x-radius/2,y),(x+radius/2,y),(0,255,0))
+def drawAnchorPoint(Img,(x,y),radius,color):
+    cv2.line(Img,(x,y-radius/2),(x,y+radius/2),color)
+    cv2.line(Img,(x-radius/2,y),(x+radius/2,y),color)
     return Img
-
-def validEyes(eyes,thresh):
-    means = []
-    summ = []
-    count = []
-    for eye in eyes:
-        if len(means)==0 or len(filter(lambda x : np.linalg.norm(x-eye) <= thresh, means)) == 0:
-            means.append(eye)
-            summ.append(summ)
-            count.append(1)
-        else:
-            for i in range(0,len(means)):
-                if np.linalg.norm(means[i]-eye)<=thresh:
-                    summ[i]+=eye
-                    count[i]+=1
-                    means[i]=summ[i]/count[i]
-    return means
 
 if __name__=="__main__":
     print "Running"
@@ -69,8 +58,6 @@ if __name__=="__main__":
                     noses = [(int(x),int(y)) for (x,y) in [x.split(' ') for x in contentTest[contentTest.index('noses:\n')+1:contentTest.index('mouthes:\n')]]]
                     mouthes = [(int(x),int(y)) for (x,y) in [x.split(' ') for x in contentTest[contentTest.index('mouthes:\n')+1:]]]
 
-                    print len(eyes),len(validEyes(eyes,10))
-
                     dEyes = [min(np.linalg.norm(np.array(eye)-np.array(gtEyeL)),np.linalg.norm(np.array(eye)-np.array(gtEyeR))) for eye in eyes]
                     dEyesLeft = [np.linalg.norm(np.array(eye)-np.array(gtEyeL)) for eye in eyes]
                     dEyesRight = [np.linalg.norm(np.array(eye)-np.array(gtEyeR)) for eye in eyes]
@@ -97,11 +84,11 @@ if __name__=="__main__":
                     Img = cv2.imread(os.path.splitext(join(sys.argv[3], fl))[0]+'.bmp',1)
 
                     for p in eyes:
-                        drawAnchorPoint(Img,p,10)
+                        drawAnchorPoint(Img,p,10,(0,255,0))
                     for p in noses:
-                        drawAnchorPoint(Img,p,10)
+                        drawAnchorPoint(Img,p,10,(255,0,0))
                     for p in mouthes:
-                        drawAnchorPoint(Img,p,10)
+                        drawAnchorPoint(Img,p,10,(255,255,0))
                     drawGroundTruthPoint(Img,gtEyeL,thresh)
                     drawGroundTruthPoint(Img,gtEyeR,thresh)
                     drawGroundTruthPoint(Img,gtNose,thresh)
