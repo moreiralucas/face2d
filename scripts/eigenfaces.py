@@ -7,52 +7,107 @@ import cv2
 import os
 # import xmltodict
 import itertools
+from skimage import feature
+from sklearn.metrics import confusion_matrix
+import matplotlib.pyplot as plt
+from sklearn.cross_validation import *
 
-if __name__=='__main__':
-    onlyfiles = [f for f in listdir(sys.argv[1]) if isfile(join(sys.argv[1], f))]
+def plot_confusion_matrix(cm, title='Confusion matrix', cmap=plt.cm.Blues):
+    plt.imshow(cm, interpolation='nearest', cmap=cmap)
+    plt.title(title)
+    plt.colorbar()
+    plt.tight_layout()
+    plt.ylabel('True label')
+    plt.xlabel('Predicted label')
+
+def match(trainX,trainY,testX):
+    distances = []
+    for x in trainX:
+        distances.append(cv2.compareHist(x, testX, cv2.cv.CV_COMP_CHISQR))
+    sorted = np.argsort(distances)
+    return trainY[sorted]
+
+def lbp(numPoints, radius, image, eps=1e-7):
+    lbp = feature.local_binary_pattern(image, numPoints,
+                                       radius, method="uniform")
+    (hist, _) = np.histogram(lbp.ravel(),  bins=np.arange(0, numPoints + 3), range=(0, numPoints + 2))
+    hist = hist.astype("float")
+    hist /= (hist.sum() + eps)
+    return hist
+
+def loadDataset(path,descriptor,args):
+    onlyfiles = [f for f in listdir(path) if isfile(join(path, f))]
     onlyfiles.sort()
     individuals = []
-    X = np.zeros((len(onlyfiles),200*100),dtype=np.float32)
+    X = np.zeros((len(onlyfiles), 26), dtype=np.float32)
     fli = 0
     for fl in onlyfiles:
-        individuals.append(os.path.splitext(fl)[0])
-        Img = cv2.imread(join(sys.argv[1], f), 0)
-        Reshape_Img = Img.reshape((1,200*100))
-        X[fli,:] = Reshape_Img
+        individuals.append(int(os.path.splitext(fl)[0].split('_')[0]))
+        Img = cv2.imread(join(sys.argv[1], fl), 0)
+        desc = descriptor(*(args+[Img]))
+        X[fli, :] = desc
         fli += 1
-    covar,mean = cv2.calcCovarMatrix(X,cv2.COVAR_SCRAMBLED + cv2.COVAR_COLS)
-    print covar.shape
+    return [X,np.array(individuals)]
+
+if __name__=='__main__':
+    print 'Loading Dataset...'
+    X,Y = loadDataset(sys.argv[1],lbp,[24,8])
+    # X_train = X[3:,:]
+    # y_train = Y[3:]
+    # X_test = X[:3]
+    # y_test = Y[:3]
+    labels = np.ones(Y.shape)*-1
+    indexs = filter(lambda indexs : indexs.shape[0]  > 1, [np.where(Y == label)[0] for label in np.unique(Y)])
+    cycle = itertools.cycle(range(0,min([i.shape[0] for i in indexs])))
+    for x in indexs:
+        cycle_bak = cycle
+        labels[x] = [next(cycle_bak) for y in x]
+    #print labels
+    skf = PredefinedSplit(labels)
+    for n_faces in range(1,51):
+        accs = []
+        for train_index, test_index in skf:
+             X_train, X_test = X[train_index], X[test_index]
+             y_train, y_test = Y[train_index], Y[test_index]
+             acerto = 0
+             erro = 0
+             for t_idx in range(len(y_test)):
+                 predicted = match(X_train,y_train,X_test[t_idx])
+                 #print predicted[:3]
+                 predicted_bak = predicted
+                 _,sort = np.unique(predicted_bak.copy(), return_index=True)
+
+                 predicted = predicted[np.sort(sort)]
+                 #print sort
+
+                 #raw_input('ok')
+                 if np.any(predicted[:n_faces] == y_test[t_idx]):
+                     acerto += 1
+                 else:
+                     erro += 1
+             acc = acerto / float(acerto + erro)
+             #print acerto, erro, acc
+             accs.append(acc)
+        #print accs
+        accuracy = np.mean(np.array(accs))
+        print (n_faces,accuracy),
+
+    #plt.figure()
+    #for train_index, test_index in skf:
+    #     X_train, X_test = X[train_index], X[test_index]
+    #     y_train, y_test = Y[train_index], Y[test_index]
+    #     print X_train.shape, y_train.shape
+    #
+    #     classifier = SVMLearning(X=X_train, Y=y_train)
+    #     predicted = classifier.guess(X_test)
+    #     cm = confusion_matrix(y_test, predicted)
+    #     np.set_printoptions(precision=2)
+    #     print('Confusion matrix, without normalization')
+    #     print(cm)
+    #     #plot_confusion_matrix(cm)
+    #     #plt.show()
+
+
+    #print eigenValues.shape, eigenVectors.shape
+
     #cv2.eigen(X,)
-
-
-
-        #
-        # for (eye1, eye2) in pairEyes:
-        #     Bak_Img = Img.copy()
-        #     center = np.divide((np.array(eye1) + np.array(eye2)), 2)
-        #     M = cv2.getRotationMatrix2D((center[0], center[1]), degrees(angle(eye1, eye2)), 1)
-        #     dst = cv2.warpAffine(Bak_Img, M, (Bak_Img.shape[1], Bak_Img.shape[0]))
-        #     eye1 = np.array(list(eye1) + [0]).reshape((1, 3))
-        #     e1p = eye1 * M
-        #     eye2 = np.array(list(eye2) + [0]).reshape((1, 3))
-        #     e2p = eye2 * M
-        #     step = int(np.linalg.norm(e1p - e2p) / 2)
-        #     minX, maxX, minY, maxY = int(min(e1p[0, 0], e2p[0, 0])), int(max(e1p[0, 0], e2p[0, 0])), int(
-        #         min(e1p[1, 1], e2p[1, 1])), int(max(e1p[1, 1], e2p[1, 1]))
-        #     crop = dst[minY - step:maxY + step, minX - step:maxX + step]
-        #     cv2.rectangle(Bak_Img, (minX - step, minY - step), (maxX + step, maxY + step), (0, 0, 255), 3)
-        #     cv2.imshow('crop', crop)
-        #     cv2.waitKey(1)
-        #     cv2.imwrite((os.path.splitext(join(sys.argv[3], fl))[0]) + '_' + str(i) + '.jpg', crop)
-        #     i += 1
-
-            # for p in eyes:
-            #     drawAnchorPoint(Img, p, 10, (0, 255, 0))
-            # for p in noses:
-            #     drawAnchorPoint(Img, p, 10, (255, 0, 0))
-            # for p in mouthes:
-            #     drawAnchorPoint(Img, p, 10, (255, 255, 0))
-
-            # cv2.imshow('teste', Img)
-            # cv2.imwrite((os.path.splitext(join(sys.argv[3], fl))[0]) + '_' + str(thresh) + '.jpg', Img)
-            # cv2.waitKey(500)
