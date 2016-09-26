@@ -8,7 +8,7 @@ Diretório:
 ```
 **n**: 1 <= n >= 25
 
-**m**: 1 <= m >= 3
+**m**: 1 <= m >= 5
 
 Arquivo referente à imagem marcada:
 
@@ -22,7 +22,7 @@ Arquivo referente à imagem marcada:
 
 Compile com:
 ```
-g++ -std=c++11 -g `pkg-config --cflags opencv` gtruth.cpp -o GroundTruth.out `pkg-config --libs opencv`
+make
 ```
 
 Execute com:
