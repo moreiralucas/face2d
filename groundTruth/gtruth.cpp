@@ -1,5 +1,6 @@
 // Comando para compilar (é necessário utilizar o c++11)
-//g++ -std=c++11 -g `pkg-config --cflags opencv` gtruth.cpp -o GroundTruth.out `pkg-config --libs opencv`
+//g++ -std=c++11 -g gtruth.cpp -o GroundTruth.out `pkg-config --libs opencv --cflags opencv`
+
 #include <iostream>
 #include <fstream>
 #include <sstream>
@@ -9,7 +10,7 @@
 using namespace cv;
 using namespace std;
 
-#define SCALE 1
+#define SCALE 2
 
 FILE *arqi, *arq2;
 Mat image, vis;
@@ -41,7 +42,7 @@ void marker(string nome){
 	fstream fp;
 
 	ponto.clear();
-	arqi= fopen(("coordenadas_groundTruth/"+ nome + ".txt").c_str(),"w");
+	arqi= fopen(("groundTruthTMP/"+ nome + ".txt").c_str(),"w");
 	// Create visualizer
 	vis.create(image.rows*SCALE, image.cols*SCALE, CV_8UC3);
 	cout << "--------------------------------\n" <<
@@ -50,7 +51,11 @@ void marker(string nome){
 		"Pressione 'S' para Salvar\nPressione 'Esc' pra ir para a próxima" << endl;
 	// Application loop
 	draw();
-	namedWindow("gtruth", 1); //Trocar o valor 1 por WINDOW_AUTOSIZE
+
+	//namedWindow("gtruth", 1); //Trocar o valor 1 por WINDOW_AUTOSIZE
+
+	namedWindow("gtruth", WINDOW_NORMAL);
+
 	setMouseCallback("gtruth", mousefunc, NULL);
 	char c;
 	while((c = waitKey(10)) != 27) {
@@ -70,7 +75,11 @@ void marker(string nome){
 	}
 	fclose(arqi);
 }
-int main() {
+int main(int argc, char const *argv[]){
+	if(argc > 1){
+		cout << "Nao preceisa passar argumentos\nUse apenas " << argv[0] << endl;
+		return 0;
+	}
 	string line, caminho = "imagens.txt";
 	std::ifstream file(caminho.c_str(), ifstream::in);
 	system("clear");

@@ -4,14 +4,31 @@ Após as marcações, será feito a média dos pontos de cada olho e posteriorme
 
 Diretório:
 ```
-<groundTruth/nomeDeQuemMarcou/n_m.bmp>
+<groundTruth/nomeDeQuemMarcou_groundTruth/n_m.bmp>
 ```
 **n**: 1 <= n >= 25
 
-**m**: 1 <= m >= 3
+**m**: 1 <= m >= 5
 
 Arquivo referente à imagem marcada:
 
 ```
 <nome da imagem.jpeg> <olhoEsq> <olhoDir> <nariz>
 ```
+
+
+# Como compilar e executar o código...
+
+
+Compile com:
+```
+make
+```
+
+Execute com:
+```
+./GroundTruth.out
+```
+
+OBS: Não é necessário passar parâmetro na execução do algoritmo
+
