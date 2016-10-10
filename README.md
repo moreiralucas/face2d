@@ -48,6 +48,27 @@
 - Estado da arte
 - Benchmarks
   - bases de dados 
-
 - **Entrega**: 01 de Agosto
-- 
+
+---
+**Trabalho 2**
+
+- Marcação manual - explicação
+- Avaliação do desempenho humano
+- Método automático de marcação
+- Avaliação em relação às marcações manuais
+- **Entrega**: 26 de setembro
+
+---
+**Trabalho 3**
+
+- Método automático de reconhecimento
+- Avaliação completamente automática / Parcialmente automático
+- Rank-N
+- Cross-Validation -> FAR/FRR/ROC
+ - Análise de performace humana
+- **Entrega**: 10 de outubro
+
+---
+
+
