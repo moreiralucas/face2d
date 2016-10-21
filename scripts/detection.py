@@ -36,8 +36,9 @@ if __name__=="__main__":
     onlyfiles = [f for f in listdir(sys.argv[1]) if isfile(join(sys.argv[1], f))]
     onlyfiles.sort()
     for fl in onlyfiles:
+        print fl
         Img = cv2.imread(join(sys.argv[1], fl),1)
-        equalized = np.zeros(Img.shape,dtype=np.uint8)
+        #equalized = np.zeros(Img.shape,dtype=np.uint8)
         if Img!=None:
 
             pEyes = detectEyes(Img)
