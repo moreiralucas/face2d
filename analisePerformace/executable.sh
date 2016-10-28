@@ -14,6 +14,7 @@
 for i in $(cat ../groundTruth/imagens.txt);
 do
 	template=`echo $i | cut -d "." -f 1`
+	zero=../groundTruth/coordenadas_groundTruth/$template".txt"
 	um=../groundTruth/alvaro_groundTruth/$template".txt"
 	dois=../groundTruth/kalyf_groundTruth/$template".txt"
 	tres=../groundTruth/lucas_groundTruth/$template".txt"
@@ -21,7 +22,7 @@ do
 	#echo $var
 	#echo $i
 	#echo $template
-	echo $um $dois $tres
+	./a.out $zero $um $dois $tres $template
 	#cat $tres
 	#./RNsID $i $var #imagens/groundtruth/$template.txt imagens/resultados/$template`echo _result`.txt 
 	#mv coordenadas.txt resultados/$template`echo _minucias`.txt

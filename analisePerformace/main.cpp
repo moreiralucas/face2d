@@ -93,6 +93,10 @@ int main(int argc, char const *argv[]){
 		cout << "Use: " << argv[0] << " <media.txt> <alvaro.txt> <kalyf.txt> <lucas.txt>" << endl;
 		return 0;
 	}
+	//cout << argv[1] << " " << argv[2] << " " << argv[3] << " " << argv[4] << endl;
+	//return 0;
+	cout << argv[5] << " ";//identificador da imagem
+
 	lerDados(argv[1], 0); //cout << "Leu ground\n\n";
 	swap(pontos, ground);
 
@@ -107,7 +111,7 @@ int main(int argc, char const *argv[]){
 
 	double M = mediaImagem(); //cout << "M: " << M << endl;
 
-	double var = variancia(M); cout << var << endl;//cout << "var: " << var << endl;
+	double var = variancia(M); //cout << var << " ";// << endl;//cout << "var: " << var << endl;
 
 	double dp = desvioPadrao(var); cout << dp << endl;//cout << "dp: " << dp << endl;
 	return 0;
