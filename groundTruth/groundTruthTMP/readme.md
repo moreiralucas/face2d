@@ -1,1 +1,1 @@
-Diretório onde será salvo as marcações de GroundTruth, para posteriormente ser movida para a pasta do responsável pela marcação.
+Diretório onde será salvo as marcações de GroundTruth, para posteriormente serem movidas para a pasta do responsável pela marcação.
